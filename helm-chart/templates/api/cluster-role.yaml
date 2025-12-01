@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    {{- include "api.labels" . | nindent 4 }}
+  name: {{ include "api.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+rules:
+  - apiGroups:
+      - llo.aeros-project.eu
+    resources:
+      - servicecomponentk8s
+      - servicecomponentdockers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch

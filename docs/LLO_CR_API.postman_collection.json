@@ -1,0 +1,254 @@
+{
+	"info": {
+		"_postman_id": "5ede205b-774d-49ed-b502-f3bb6cc5ae49",
+		"name": "LLO CR API",
+		"description": "API to list, delete and create K8s Custom Resources managed by aeriOS LLO.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4357296"
+	},
+	"item": [
+		{
+			"name": "Get API version",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "10.0.0.219:30890/version",
+					"host": [
+						"10",
+						"0",
+						"0",
+						"219"
+					],
+					"port": "30890",
+					"path": [
+						"version"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get API health status",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "10.0.0.219:30890/health",
+					"host": [
+						"10",
+						"0",
+						"0",
+						"219"
+					],
+					"port": "30890",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get deployed Service Components",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "10.0.0.219:30890/v1/service-components",
+					"host": [
+						"10",
+						"0",
+						"0",
+						"219"
+					],
+					"port": "30890",
+					"path": [
+						"v1",
+						"service-components"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "docker",
+							"description": "k8s or docker",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a deployed Service Component by name",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "10.0.0.219:30890/v1/service-components/service-1-component-1",
+					"host": [
+						"10",
+						"0",
+						"0",
+						"219"
+					],
+					"port": "30890",
+					"path": [
+						"v1",
+						"service-components",
+						"service-1-component-1"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "docker",
+							"description": "k8s or docker",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deploy a ServiceComponentK8s",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/yaml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "apiVersion: llo.aeros-project.eu/v1alpha1\r\nkind: ServiceComponentK8s\r\nmetadata:\r\n  labels:\r\n    app.kubernetes.io/name: component-1-of-the-service-1\r\n    app.kubernetes.io/instance: Service_1_Component_1\r\n    app.kubernetes.io/part-of: Service_1\r\n    app.kubernetes.io/managed-by: aeros-project.eu\r\n    app.kubernetes.io/created-by: LowLevelOrchestrator_2\r\n  name: service-1-component-1\r\nspec:\r\n  selectedIE: urn:ngsi-ld:IE:aeros-2-jms6qnflylil-node-0\r\n  image: fiware/orion-ld:1.5.1\r\n  ports:\r\n    - number: 1026\r\n      protocol: TCP\r\n  cliArgs:\r\n    - key: -brokerId\r\n      value: test-broker\r\n    - key: -dbhost\r\n      value: service-1-mongo\r\n    - key: -t\r\n      value: 0-255\r\n    - key: -logLevel\r\n      value: DEBUG\r\n    - key: -forwarding\r\n    - key: -experimental\r\n    - key: -wip\r\n      value: entityMaps",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "10.0.0.219:30890/v1/service-components",
+					"host": [
+						"10",
+						"0",
+						"0",
+						"219"
+					],
+					"port": "30890",
+					"path": [
+						"v1",
+						"service-components"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deploy a ServiceComponentDocker",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/yaml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "apiVersion: llo.aeros-project.eu/v1alpha1\r\nkind: ServiceComponentDocker\r\nmetadata:\r\n  labels:\r\n    app.kubernetes.io/name: component-1-of-the-service-1\r\n    app.kubernetes.io/instance: Service_1_Component_1\r\n    app.kubernetes.io/part-of: Service_1\r\n    app.kubernetes.io/managed-by: aeros-project.eu\r\n    app.kubernetes.io/created-by: LowLevelOrchestrator_1\r\n  name: service-1-component-1\r\nspec:\r\n  selectedIE: urn:ngsi-ld:IE:aeros-2-jms6qnflylil-node-1\r\n  image: fiware/orion-ld:1.5.1\r\n  ports:\r\n    - number: 1026\r\n      protocol: TCP\r\n  cliArgs:\r\n    - key: -brokerId\r\n      value: test-broker\r\n    - key: -dbhost\r\n      value: service-1-mongo\r\n    - key: -t\r\n      value: 0-255\r\n    - key: -logLevel\r\n      value: DEBUG\r\n    - key: -forwarding\r\n    - key: -experimental\r\n    - key: -wip\r\n      value: entityMaps",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "10.0.0.219:30890/v1/service-components",
+					"host": [
+						"10",
+						"0",
+						"0",
+						"219"
+					],
+					"port": "30890",
+					"path": [
+						"v1",
+						"service-components"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete a Service Component",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "10.0.0.219:30890/v1/service-components/service-1-component-1",
+					"host": [
+						"10",
+						"0",
+						"0",
+						"219"
+					],
+					"port": "30890",
+					"path": [
+						"v1",
+						"service-components",
+						"service-1-component-1"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "docker",
+							"description": "docker or k8s",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

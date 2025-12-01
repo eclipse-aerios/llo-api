@@ -1,0 +1,342 @@
+openapi: 3.0.0
+
+info:
+  version: "1.1.0"
+  title: aeriOS LLO API
+  contact:
+    email: info@aerios-project.eu
+  license:
+    name: Apache 2.0
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+
+servers:
+  - description: LLO API
+    url: "{protocol}://{hostname}:{port}"
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
+      hostname:
+        default: localhost
+      port:
+        default: "8090"
+
+tags:
+  - name: Common
+  - name: LLO API
+    description: REST API to list, update, delete and create K8s Custom Resources managed by aeriOS LLO Operators.
+
+paths:
+  /version:
+    get:
+      tags:
+        - Common
+      summary: Returns the API version
+      operationId: version
+      description: |
+        Returns the API version along with the supported K8s CRs
+      responses:
+        "200":
+          description: API version
+  /health:
+    get:
+      tags:
+        - Common
+      summary: Returns the health status
+      operationId: health
+      description: |
+        Returns the health status of the API: HEALTHY or UNHEALTHY
+      responses:
+        "200":
+          description: Healthy status
+        "500":
+          description: Unhealthy status
+
+  /v1/service-components:
+    get:
+      tags:
+        - LLO API
+      summary: Retrieves all the deployed Service Components
+      operationId: getServiceComponents
+      description: Retrieves all the deployed Service Components
+      parameters:
+        - name: type
+          in: query
+          description: Type of the LLO
+          required: true
+          schema:
+            type: string
+            enum:
+              - docker
+              - k8s
+        - name: onlyNames
+          in: query
+          description: Return only the Service Component names
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of deployed Service Components
+        "400":
+          description: Invalid LLO type
+        "500":
+          description: Internal error
+    post:
+      tags:
+        - LLO API
+      summary: Deploys a Service Component
+      operationId: deployServiceComponent
+      description: |
+        Deploys a Service Component in the K8s cluster
+      requestBody:
+        description: ServiceComponent K8s Custom Resource
+        content:
+          application/yaml:
+            schema:
+              $ref: "#/components/schemas/ServiceComponentCR"
+      responses:
+        "201":
+          description: Service Component deployed
+        "400":
+          description: Bad request
+        "409":
+          description: This Service Component already exists
+    put:
+      tags:
+        - LLO API
+      summary: Replace a Service Component
+      operationId: replaceServiceComponent
+      description: |
+        Replaces a Service Component in the K8s cluster
+      requestBody:
+        description: ServiceComponent K8s Custom Resource
+        content:
+          application/yaml:
+            schema:
+              $ref: "#/components/schemas/ServiceComponentCR"
+      responses:
+        "200":
+          description: Service Component replaced
+        "400":
+          description: Bad request
+
+  "/v1/service-components/{scName}":
+    get:
+      tags:
+        - LLO API
+      summary: Retrieves a deployed Service Component
+      operationId: getServiceComponentByName
+      description: Retrieves a deployed Service Component
+      parameters:
+        - name: scName
+          in: path
+          description: Name of the Service Component
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Type of the LLO
+          required: true
+          schema:
+            type: string
+            enum:
+              - docker
+              - k8s
+      responses:
+        "200":
+          description: List of deployed Service Components
+        "400":
+          description: Invalid LLO type
+        "404":
+          description: Service Component not found
+        "500":
+          description: Internal error
+    patch:
+      tags:
+        - LLO API
+      summary: Updates a Service Component
+      operationId: updateServiceComponent
+      description: |
+        Updates a Service Component in the K8s cluster
+      parameters:
+        - name: scName
+          in: path
+          description: Name of the Service Component
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Type of the LLO
+          required: true
+          schema:
+            type: string
+            enum:
+              - docker
+              - k8s
+      requestBody:
+        description: Part of a ServiceComponent K8s Custom Resource
+        content:
+          application/yaml:
+            schema:
+              $ref: "#/components/schemas/ServiceComponentSpec"
+      responses:
+        "200":
+          description: Service Component updated
+        "400":
+          description: Bad request
+    delete:
+      tags:
+        - LLO API
+      summary: Deletes a deployed Service Component
+      operationId: deleteServiceComponentByName
+      description: Deletes a deployed Service Component
+      parameters:
+        - name: scName
+          in: path
+          description: Name of the Service Component
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Type of the LLO
+          required: true
+          schema:
+            type: string
+            enum:
+              - docker
+              - k8s
+      responses:
+        "200":
+          description: Service Component deleted
+        "400":
+          description: Invalid LLO type
+        "404":
+          description: Service Component not found
+        "500":
+          description: Internal error
+
+components:
+  schemas:
+    ServiceComponentSpec:
+      description: "Spec of a Service Component K8s Custom Resource"
+      type: object
+      properties:
+        cliArgs:
+          description: CLI arguments
+          items:
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+            type: object
+          type: array
+        envVars:
+          description: Environment variables
+          items:
+            properties:
+              key:
+                type: string
+              value:
+                type: string
+            type: object
+          type: array
+        exposePorts:
+          description: Expose the network ports outside the node
+          type: boolean
+        image:
+          description: Container image of the service component
+          type: string
+        imageRegistry:
+          description: Configuration to use a private container image registry
+          properties:
+            password:
+              type: string
+            url:
+              description: Full url of the OCI image registry
+              type: string
+            username:
+              description: User credentials
+              type: string
+          type: object
+        networkOverlay:
+          description: aeriOS service network overlay configuration
+          properties:
+            allowedIps:
+              type: string
+            dns:
+              type: string
+            endpoint:
+              type: string
+            internalIp:
+              type: string
+            mtu:
+              type: integer
+            persistentKeepalive:
+              type: integer
+            privateKey:
+              type: string
+            publicKey:
+              type: string
+          type: object
+        ports:
+          description: Ports to expose
+          items:
+            properties:
+              number:
+                description: Expose the network port outside the node
+                format: int32
+                type: integer
+              protocol:
+                type: string
+            type: object
+          type: array
+        privileged:
+          description: Privileged opt
+          type: boolean
+        selectedIE:
+          description: Selected IE by the HLO
+          properties:
+            hostname:
+              description: hostname attribute of the Infrastructure Element
+                NGSI-LD entity
+              type: string
+            id:
+              description: ID of the Infrastructure Element NGSI-LD entity
+              type: string
+          type: object
+    ServiceComponentCR:
+      description: "Service Component K8s Custom Resource"
+      type: object
+      properties:
+        apiVersion:
+          type: string
+          example: llo.aeros-project.eu/v1alpha1
+        kind:
+          type: string
+          enum:
+            - ServiceComponentDocker
+            - ServiceComponentK8s
+        metadata:
+          type: object
+          properties:
+            labels:
+              type: array
+              items:
+                type: object
+              example:
+                app.kubernetes.io/name: component-1-of-the-service-1
+                app.kubernetes.io/instance: Service_1_Component_1
+                app.kubernetes.io/part-of: Service_1
+                app.kubernetes.io/managed-by: aeros-project.eu
+                app.kubernetes.io/created-by: LowLevelOrchestrator_2
+            name:
+              type: string
+        spec: 
+          $ref: "#/components/schemas/ServiceComponentSpec"

@@ -1,0 +1,24 @@
+apiVersion: llo.aeros-project.eu/v1alpha1
+kind: ServiceComponentK8s
+metadata:
+  labels:
+    app.kubernetes.io/name: component-1-of-the-service-1
+    app.kubernetes.io/instance: Service_1_Component_1
+    app.kubernetes.io/part-of: Service_1
+    app.kubernetes.io/managed-by: aeros-project.eu
+    app.kubernetes.io/created-by: LowLevelOrchestrator_2
+  name: service-component-nginx
+spec:
+  selectedIE:
+    id: urn:ngsi-ld:InfrastructureElement:CloudFerro:4073c6a5a93b
+    hostname: continuum-cluster-worker-1
+  image: registry.my-private-gitlab.eu/public-repo/nginx
+  ports:
+    - number: 80
+      protocol: TCP
+    - number: 443
+      protocol: TCP
+  imageRegistry:
+    # url: registry.gitlab.aerios-project.eu
+    username: user
+    password: token
